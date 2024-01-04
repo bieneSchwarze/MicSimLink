@@ -1,4 +1,4 @@
-This repository includes a generic microsimulation model and the associated R software micSimLink for generating family structures and generational relationships. 
+This repository includes a generic microsimulation model and the associated R software micSimLink for generating family structures and generational relationships (@author Sabine Zinn). 
 *micSimLink* allows to create and develop family biographies from family members for feasible population shares over calendar time. 
 The crucial characteristics are sex, children, and living arrangement or partnership status. 
 Further characteristics such as nationality or education level can be added if required. 
