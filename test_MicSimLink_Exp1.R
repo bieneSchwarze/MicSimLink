@@ -17,9 +17,9 @@
 
 # For starting with this example, load files that way (without a package built)
 rm(list=ls())
-source("D:\\MicSim_Package\\MicSimLink\\auxFctMicSimLink.R")
-source("D:\\MicSim_Package\\MicSimLink\\micSimLink.R")
-source("D:\\MicSim_Package\\MicSimLink\\convertToLong.R")
+source("G:\\MicSim_Package\\MicSimLink\\auxFctMicSimLink.R")
+source("G:\\MicSim_Package\\MicSimLink\\micSimLink.R")
+source("G:\\MicSim_Package\\MicSimLink\\convertToLong.R")
 
 # ------------------------------------------------------------------------------
 # Defining simulation horizon
@@ -50,7 +50,7 @@ absStates <- "dead"
 # ------------------------------------------------------------------------------
 # Definition of an initial population (for illustration purposes, create a random population)
 # ------------------------------------------------------------------------------
-N = 10000
+N = 100000
 birthDates <- runif(N, min=getInDays(19500101), max=getInDays(20131231)) 
 getRandInitState <- function(birthDate){
   age <- trunc((getInDays(simHorizon[1]) - birthDate)/365.25) 
@@ -183,55 +183,11 @@ pop <- micSimLink(initPop=initPop,
 # ------------------------------------------------------------------------------
 # Have a look at the outcome
 # ------------------------------------------------------------------------------
+head(pop)
+
 # Convert to Long format
 popLong <- convertToLongFormat(pop)
 popLong$OD[popLong$OD %in% "noTr"] <- "1->1"
 table(popLong$OD)
-
-# Age differences between mates (female triggered)
-popFem <- pop[grep("f", pop$initState),] 
-popMated <- popFem[!is.na(popFem$partnerID),]
-matMates <- cbind.data.frame(ID=popMated$ID, partnerID=popMated$partnerID, birthDateFem=popMated$birthDate)
-matMates$coupleID <- apply(matMates[,1:2],1,paste,collapse="-")
-table(matMates$ID %in% popFem$ID) # ID all females and partnerID all males
-matMates <- matMates[!duplicated(matMates$coupleID),]
-matMates <- merge(matMates, pop[, c("ID","birthDate")], by.x = "partnerID", by.y="ID", all.x=T) 
-colnames(matMates)[colnames(matMates) %in% "birthDate"] <- "birthDateMale"
-matMates <- matMates[!duplicated(matMates$coupleID),]
-ageDiff_sim <- (getInDays(matMates$birthDateMale) - getInDays(matMates$birthDateFem))/365.25
-agesMates <- expand.grid(seq(from=-20, to=20, length=200),seq(from=-20, to=20,length=200))
-ageDiff_in <- agesMates[,1]-agesMates[,2]
-plot(ageDiff_in, ageDiffDistr(ageDiff_in), type = "p", pch=20, ylab="Matching Probability", xlab="age male - age female")
-ageDiff_hist <- hist(ageDiff_sim, plot=F)
-lines(ageDiff_hist$mids, ageDiff_hist$density, col="red", type="h", lwd=1.5)
-legend("topright", fill=c("black", "red"), c("Input", "Simulated"))
-
-# Re-estimate transition rates
-# Move-out (->PH)
-riskSet <- c("f/PH/0", "f/PH/1", "m/PH/0", "m/PH/1")
-events <- cbind.data.frame(From=c("f/PH/0", "f/PH/1", "m/PH/0", "m/PH/1"), 
-                            To=c("f/A/0", "f/A/1", "m/A/0", "m/A/1"))
-rates_MoveOut <- estimateAgeRates(pop, riskSet, events)
-
-
-
-# initPop=initPop
-# immigrPop=NULL #immigrPop
-# transitionMatrix=transitionMatrix
-# absStates=absStates
-# fixInitStates = c()
-# varInitStates=varInitStates
-# initStatesProb=initStatesProb
-# maxAge=100
-# simHorizon=simHorizon
-# fertTr=fertTr
-# partTr=partTr
-# rule=1
-# ageDiffDistr = ageDiffDistr
-# sepTr=sepTr
-# probSepTr = probSepTr
-# absPartTr=absPartTr
-# monthSchoolEnrol=c()
-# duration=FALSE
 
 
